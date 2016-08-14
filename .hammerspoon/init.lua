@@ -44,7 +44,18 @@ positions = {
   lower50Left50 = {x=0, y=0.5, w=0.5, h=0.5},
   lower50Right50 = {x=0.5, y=0.5, w=0.5, h=0.5},
 
-  chat = {x=0.5, y=0, w=0.35, h=0.5}
+  chat = {x=0.5, y=0, w=0.35, h=0.5},
+
+  -- these paired together fill the right half of the screen
+  right50top70 = {x=0.5, y=0, w=0.5, h=0.7},
+  terminalLarge = {x=0.5, y=0.7, w=0.5, h=0.3},
+
+  -- these paried together fill the left half of the screen
+  left50top50 = {x=0, y=0, w=0.5, h=0.5},
+  left50bottom50 = {x=0, y=0.5, w=0.5, h=0.5},
+
+  brokenscreenright = {x=0.5, y=0, w=0.40, h=1},
+  brokenscreencentered = {x=0.05, y=0.05, w=0.8, h=.95}
 }
 
 --
@@ -53,38 +64,53 @@ positions = {
 
 layouts = {
   {
-    name="OCaml",
-    description="Emacs, Chrome, Terminal",
+    name="Sublime (General)",
+    description="Sublime, Chrome, Terminal",
     small={
-      {"Emacs", nil, screen, positions.left66, nil, nil},
-      {"Google Chrome", nil, screen, positions.left66, nil, nil},
-      {"Terminal", nil, screen, positions.right34, nil, nil},
-      {"Spotify", nil, screen, positions.centered, nil, nil},
-      {"Evernote", nil, screen, positions.centered, nil, nil},
+      {"Sublime Text", nil, screen, positions.left50, nil, nil},
+      {"Google Chrome", nil, screen, positions.brokenscreencentered, nil, nil},
+      {"Terminal", nil, screen, positions.brokenscreenright, nil, nil},
+      {"Spotify", nil, screen, positions.brokenscreencentered, nil, nil},
+      {"Evernote", nil, screen, positions.brokenscreencentered, nil, nil},
     },
     large={
-      {"Emacs", nil, screen, positions.left50, nil, nil},
-      {"Google Chrome", nil, screen, positions.upper50Right50, nil, nil},
-      {"Terminal", nil, screen, positions.lower50Right50, nil, nil},
+      {"Sublime Text", nil, screen, positions.left50, nil, nil},
+      {"Google Chrome", nil, screen, positions.right50top70, nil, nil},
+      {"Terminal", nil, screen, positions.terminalLarge, nil, nil},
       {"Spotify", nil, screen, positions.centered, nil, nil},
       {"Evernote", nil, screen, positions.centered, nil, nil},
     }
   },
   {
-    name="???",
-    description="WIP",
+    name="Sublime (Learning Ember.js)",
+    description="Sublime, Chrome, Terminal, Ember-CLI pdf",
+    large={
+      {"Sublime Text", nil, screen, positions.right50top70, nil, nil},
+      {"Google Chrome", nil, screen, positions.left50top50, nil, nil},
+      {"Terminal", nil, screen, positions.terminalLarge, nil, nil},
+      {"Preview", nil, screen, positions.left50bottom50}
+    }
+  },
+  {
+    name="Emacs",
+    description="Emacs, Chrome, Terminal",
     small={
-      {"Firefox", nil, screen, positions.maximized, nil, nil},
-      {"Slack",   nil, screen, positions.maximized, nil, nil},
-      {"Twitter", nil, screen, positions.right30, nil, nil},
+      {"Emacs", nil, screen, positions.left50, nil, nil},
+      {"Google Chrome", nil, screen, positions.brokenscreencentered, nil, nil},
+      {"Terminal", nil, screen, positions.brokenscreenright, nil, nil},
+      {"Spotify", nil, screen, positions.brokenscreencentered, nil, nil},
+      {"Evernote", nil, screen, positions.brokenscreencentered, nil, nil},
     },
     large={
-      {"Firefox", nil, screen, positions.left50, nil, nil},
-      {"Firefox", "Console - ", screen, positions.lower50Right50, nil, nil},
-      {"Slack",   nil, screen, positions.chat, nil, nil},
-      {"Twitter", nil, screen, positions.upper50Right15, nil, nil},
+      {"Emacs", nil, screen, positions.left50, nil, nil},
+      {"Google Chrome", nil, screen, positions.right50top70
+      , nil, nil},
+      {"Terminal", nil, screen, positions.terminalLarge, nil, nil},
+      {"Spotify", nil, screen, positions.centered, nil, nil},
+      {"Evernote", nil, screen, positions.centered, nil, nil},
     }
-  }
+  },
+
 }
 currentLayout = null
 
@@ -158,7 +184,6 @@ hs.fnutils.each(grid, function(entry)
     local index = 0
     hs.fnutils.find(units, function(unit)
       index = index + 1
-
       local geo = hs.geometry.new(unit):fromUnitRect(screen:frame()):floor()
       return windowGeo:equals(geo)
     end)
@@ -180,3 +205,56 @@ hs.hotkey.bind({}, 'f3', hs.spotify.next)
 hs.hotkey.bind({}, 'f4', hs.spotify.displayCurrentTrack)
 
 -- end section Spotify controller
+
+-- section Mouse controller 
+local defaultVelocity = 15
+local velocity = 15
+
+function moveCursor(direction, fasterVelocity)
+
+  local pos = hs.mouse.getAbsolutePosition()
+
+  if fasterVelocity then
+    velocity = 100
+  end
+
+  if direction == "LEFT" then
+    pos.x = pos.x - velocity
+  end
+  if direction == "RIGHT" then
+    pos.x = pos.x + velocity
+  end
+  if direction == "UP" then
+    pos.y = pos.y - velocity
+  end
+  if direction == "DOWN" then
+    pos.y = pos.y + velocity
+  end
+  
+  hs.mouse.setAbsolutePosition(pos)
+  velocity = defaultVelocity
+end
+
+function moveCursorLeft(fasterVelocity) moveCursor("LEFT", fasterVelocity) end
+function moveCursorRight(fasterVelocity) moveCursor("RIGHT", fasterVelocity) end
+function moveCursorUp(fasterVelocity) moveCursor("UP", fasterVelocity) end
+function moveCursorDown(fasterVelocity) moveCursor("DOWN", fasterVelocity) end
+
+function sendClick()
+  hs.eventtap.leftClick(hs.mouse.getAbsolutePosition())
+end
+
+hs.hotkey.bind({"cmd", "ctrl", "alt"}, 'left', moveCursorLeft)
+hs.hotkey.bind({"cmd", "ctrl", "alt"}, 'right', moveCursorRight)
+hs.hotkey.bind({"cmd", "ctrl", "alt"}, 'up', moveCursorUp)
+hs.hotkey.bind({"cmd", "ctrl", "alt"}, 'down', moveCursorDown)
+hs.hotkey.bind({"cmd", "ctrl", "alt", "shift"}, 'left', function () moveCursorLeft(true) end)
+hs.hotkey.bind({"cmd", "ctrl", "alt", "shift"}, 'right', function () moveCursorRight(true) end)
+hs.hotkey.bind({"cmd", "ctrl", "alt", "shift"}, 'up', function () moveCursorUp(true) end)
+hs.hotkey.bind({"cmd", "ctrl", "alt", "shift"}, 'down', function () moveCursorDown(true) end)
+hs.hotkey.bind({"cmd", "ctrl", "alt"}, 'space', sendClick)
+
+-- end section Mouse controller
+
+
+
