@@ -196,6 +196,38 @@ end)
 
 -- end section window manipulation
 
+-- section screen manipulation
+
+function moveWindowRight()
+  local win = hs.window.focusedWindow()
+  local f = win:frame()
+  local screen = s or win:screen()
+  local max = screen:next():frame()
+
+  f.x = max.x
+  f.y = max.y
+  f.w = max.w
+  f.h = max.h
+  win:setFrame(f)
+end
+
+function moveWindowLeft()
+  local win = hs.window.focusedWindow()
+  local f = win:frame()
+  local screen = s or win:screen()
+  local max = screen:previous():frame()
+
+  f.x = max.x
+  f.y = max.y
+  f.w = max.w
+  f.h = max.h
+  win:setFrame(f)
+end
+
+hs.hotkey.bind({"cmd", "ctrl", "alt"}, "right", moveWindowRight)
+hs.hotkey.bind({"cmd", "ctrl", "alt"}, "left", moveWindowLeft)
+
+-- end section screen manipulation
 
 -- section Spotify controller
 
@@ -205,56 +237,5 @@ hs.hotkey.bind({}, 'f3', hs.spotify.next)
 hs.hotkey.bind({}, 'f4', hs.spotify.displayCurrentTrack)
 
 -- end section Spotify controller
-
--- section Mouse controller 
-local defaultVelocity = 15
-local velocity = 15
-
-function moveCursor(direction, fasterVelocity)
-
-  local pos = hs.mouse.getAbsolutePosition()
-
-  if fasterVelocity then
-    velocity = 100
-  end
-
-  if direction == "LEFT" then
-    pos.x = pos.x - velocity
-  end
-  if direction == "RIGHT" then
-    pos.x = pos.x + velocity
-  end
-  if direction == "UP" then
-    pos.y = pos.y - velocity
-  end
-  if direction == "DOWN" then
-    pos.y = pos.y + velocity
-  end
-  
-  hs.mouse.setAbsolutePosition(pos)
-  velocity = defaultVelocity
-end
-
-function moveCursorLeft(fasterVelocity) moveCursor("LEFT", fasterVelocity) end
-function moveCursorRight(fasterVelocity) moveCursor("RIGHT", fasterVelocity) end
-function moveCursorUp(fasterVelocity) moveCursor("UP", fasterVelocity) end
-function moveCursorDown(fasterVelocity) moveCursor("DOWN", fasterVelocity) end
-
-function sendClick()
-  hs.eventtap.leftClick(hs.mouse.getAbsolutePosition())
-end
-
-hs.hotkey.bind({"cmd", "ctrl", "alt"}, 'left', moveCursorLeft)
-hs.hotkey.bind({"cmd", "ctrl", "alt"}, 'right', moveCursorRight)
-hs.hotkey.bind({"cmd", "ctrl", "alt"}, 'up', moveCursorUp)
-hs.hotkey.bind({"cmd", "ctrl", "alt"}, 'down', moveCursorDown)
-hs.hotkey.bind({"cmd", "ctrl", "alt", "shift"}, 'left', function () moveCursorLeft(true) end)
-hs.hotkey.bind({"cmd", "ctrl", "alt", "shift"}, 'right', function () moveCursorRight(true) end)
-hs.hotkey.bind({"cmd", "ctrl", "alt", "shift"}, 'up', function () moveCursorUp(true) end)
-hs.hotkey.bind({"cmd", "ctrl", "alt", "shift"}, 'down', function () moveCursorDown(true) end)
-hs.hotkey.bind({"cmd", "ctrl", "alt"}, 'space', sendClick)
-
--- end section Mouse controller
-
 
 
