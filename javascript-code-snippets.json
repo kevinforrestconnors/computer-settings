@@ -1,0 +1,22 @@
+{
+	"For Loop With Const": {
+		"prefix": ["for", "for-const"],
+		"body": ["for (const ${2:element} of ${1:array}) {", "\t$0", "}"],
+		"description": "A for loop of an iterable."
+	},
+	"For Loop": {
+		"prefix": ["for"],
+		"body": ["for (let i = 0; i < ${1:array}.length; i++) {", "\t$0", "}"],
+		"description": "A for loop."
+	},
+	"Given, When, Then": {
+		"prefix": ["gwt", "given"],
+		"body": ["// given\n\n\n// when\n\n\n// then"],
+		"description": "Given, When, Then comment blocks."
+	},
+	"it(Scenario)": {
+		"prefix": ["it", "test"],
+		"body": ["it('${1}', () => {\n// given\n\n\n// when\n\n\n// then\n});"],
+		"description": "A blank test case template."
+	}
+}
